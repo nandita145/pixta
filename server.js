@@ -14,11 +14,15 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 
 var expressSession = require('express-session');
+const MemoryStore = require('memorystore')(expressSession)
 app.use(expressSession({
     'key': 'user_id',
-    'secret': 'user secret object ID',
+    'secret': 'usersecretobjectID',
     'resave': true,
-    'saveUninitialized': true
+    'saveUninitialized': true,
+    store: new MemoryStore({
+        checkPeriod: 86400000 // prune expired entries every 24h
+      })
 }));
 
 var bodyParser = require('body-parser');
