@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 var http = require('http').createServer(app);
-
+require('dotenv').config();
 var mongodb = require('mongodb');
 var ObjectId = mongodb.ObjectId;
 var mongoClient = mongodb.MongoClient;
@@ -59,7 +59,7 @@ function getUser(userId, callBack) {
 http.listen(process.env.PORT || 3000, function () {
     console.log("Connected");
 
-    mongoClient.connect("mongodb://localhost:27017", { useUnifiedTopology: true },
+    mongoClient.connect(process.env.DATABASE, { useUnifiedTopology: true },
         function (error, client) {
             if (error) {
                 console.log(error);
