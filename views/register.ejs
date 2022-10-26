@@ -1,0 +1,75 @@
+<%- include ('partials/header') %>
+
+<div id="titlebar" class="gradient">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <!-- <h2>Register</h2> -->
+                <!-- <nav id="breadcrumbs" class="dark">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li>Register</li>
+                    </ul>
+                </nav> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container" style="min-height: 80vh;">
+    <div class="row mt-5">
+        <div class="col-xl-6 offset-xl-3  card shadow">
+            <div class="login-register-page p-3">
+                <div class="welcome-text">
+                    <h2>Register</h2>
+                    <h4>Let's create your account!</h4>
+                </div>
+
+                <% if (typeof query.error !== "undefined"){ %>
+                    <div class="notification error closable">
+                        <% if (query.error == "mismatch"){ %>
+                            Password does not mismatch
+                        <% } %>
+
+                        <% if (query.error == "exists"){ %>
+                            Email already exists.
+                        <% } %>
+                    </div>
+                <% } %>
+
+
+                <form action="/register" method="post">
+                    <div class="mb-3">
+                        <i class="icon-material-baseline-mail-outline"></i>
+                        <input type="text" name="name" id="" class="form-control with-border" placeholder="Name" required />
+                    </div>
+                    <div class="mb-3">
+                        <i class="icon-material-baseline-mail-outline"></i>
+                        <input type="text" name="email" id="" class="form-control with-border" placeholder="Email Address" required />
+                    </div>
+
+                    <div class="mb-3" data-tippy-placement="bottom">
+                        <i class="icon-material-outline-lock"></i>
+                        <input type="password" name="password" id="" class="form-control with-border" placeholder="Enter Password" required />
+                    </div>
+
+                    <div class="mb-3" data-tippy-placement="bottom">
+                        <i class="icon-material-outline-lock"></i>
+                        <input type="password" name="confirm_password" id="" class="form-control with-border" placeholder="Confirm Password" required />
+                    </div>
+<div class="d-grid">
+                    <button type="submit" class="button-sm mb-3 text-center full-width button-sliding-icon ripple-effect margin-top-10" type="submit">Register <i class="icon-material-outline-arrow-right-alt"></i></button>
+                </div>
+                <p class="text-center">Already have an account? <a class="text-decoration-none" href="/login">Login!</a></p>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<%- include ('partials/footer') %>

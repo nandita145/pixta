@@ -1,0 +1,58 @@
+<%- include ("partials/header") %>
+<div class="display-100vh" style="min-height: 80vh;">
+<div class="container p-3">
+    <%= search.length %> Results found 
+</div>
+
+<div class="container p-3">
+    <ul class="list-group">
+<% for(var i=0;i< search.length;i++){ %>     
+            <!-- <%=i+1%>       -->
+            <a class="text-decoration-none" href="view-profile?id=<%= search[i]._id %>">
+            <div class="card mb-3" >
+                <div class="row g-0">
+                    
+                  <div class="col-md-1 text-center p-2">
+                    <img src="<%= search[i].profile %>" class="avatar-md" alt="...">
+                  </div>
+                  <div class="col-md-8">
+                    <div class="card-body">
+                      <h5 class="card-title"><%=search[i].name %></h5>
+                    </div>
+                  </div>
+
+
+
+                </div>
+              </div>
+            </a>
+    
+            
+    <%}%>    
+</ul>
+</div>
+</div>
+<%- include ("partials/footer") %>
+
+
+
+
+
+<% /* %>
+<div class="col-md-3">
+  <% if (search[i]._id!=user._id){ %>
+
+    <% if (following =='Follow'){ %>
+    <form action="/follow" method="post">
+    <button type="submit" class="btn button-outline" name="follow" value="<%= requestedUser._id %>" ><%= following %></button>
+    </form>
+    <% } else { %>
+        <form action="/unfollow" method="post">
+        <button type="submit" class="btn button-sm" name="follow" value="<%= requestedUser._id %>" ><%= following %></button>
+    </form>
+    <% } %>
+
+<% } %>
+</div> 
+
+<% */ %>

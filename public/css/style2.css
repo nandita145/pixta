@@ -1,0 +1,152 @@
+.button{
+    border: none;
+	margin: 0;
+	padding: 20px;
+	width: auto;
+	overflow: visible;
+	background: rgb(255, 0, 115);
+	color: white;
+	font: inherit;
+	line-height: normal;
+	cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+}
+.button:hover{
+    color: #fff;
+}
+
+.button-sm{
+    border: none;
+	margin: 0;
+	padding: 10px;
+	width: auto;
+	overflow: visible;
+	background: rgb(255, 0, 115);
+	color: white;
+	font: inherit;
+	line-height: normal;
+	cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+}
+.button-sm:hover{
+    color: rgb(255, 0, 115);
+	background-color: #fff;
+	border: 2px solid rgb(255, 0, 115);
+}
+
+.button-outline{
+    border: none;
+	margin: 0;
+	padding: 10px;
+	width: auto;
+	overflow: visible;
+	background: transparent;
+	border: 2px solid rgb(255, 0, 115);
+	color: rgb(255, 0, 115);
+	font: inherit;
+	line-height: normal;
+	cursor: pointer;
+    text-decoration: none;
+    font-weight: bold;
+}
+.button-outline:hover{
+    color: #fff;
+	background-color: rgb(255, 0, 115);
+}
+
+.ripple-effect-dark,
+.ripple-effect {
+	overflow: hidden;
+	position: relative;
+	z-index: 1;
+}
+
+.ripple-effect span.ripple-overlay,
+.ripple-effect-dark span.ripple-overlay {
+	animation: ripple 0.9s;
+	border-radius: 100%;
+	background: #fff;
+	height: 12px;
+	position: absolute;
+	width: 12px;
+	line-height: 12px;
+	opacity: 0.1;
+	pointer-events: none;
+}
+
+.ripple-effect-dark span.ripple-overlay { background: #000; opacity: 0.07; }
+
+@keyframes ripple {
+  0% {
+	 -webkit-transform: scale(4);
+				transform: scale(4);
+  }
+  100% {
+	 opacity: 0;
+	 -webkit-transform: scale(40);
+				transform: scale(40);
+  }
+}
+
+.footer{
+    background: rgb(255, 0, 115);
+    padding: 20px;
+    color: #fff;
+    /* text-align: center;
+    justify-content: center;
+    align-items: center; */
+}
+
+.avatar{
+	border-radius: 300px;
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+    border: 1px solid black;
+    background-color: black;
+	margin-bottom: 10px;
+}
+
+.avatar-sm{
+	border-radius: 300px;
+    width: 45px;
+    height: 45px;
+    object-fit: contain;
+    border: 1px solid black;
+    background-color: black;
+	margin-bottom: 10px;
+}
+
+.avatar-md{
+	border-radius: 300px;
+    width: 80px;
+    height: 80px;
+    object-fit: contain;
+    border: 1px solid black;
+    background-color: black;
+	margin-bottom: 10px;
+}
+
+.nav-link2{
+	color: rgb(255, 0, 115);
+	font-weight: 500;
+	text-decoration: none;
+}
+
+.nav-link2:hover{
+	color: rgb(255, 0, 115);
+	text-decoration: underline;
+
+}
+
+/* .nav-link2:active{
+	color: rgb(255, 0, 115);
+	text-decoration: underline;
+} */
+
+.active-link{
+	color: rgb(255, 0, 115);
+	text-decoration: underline;
+}

@@ -1,0 +1,38 @@
+<%- include ('partials/header') %>
+
+<!-- <div id="titlebar" class="gradient">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Login</h2>
+                <nav id="breadcrumbs" class="dark">
+                    <ul>
+                        <li><a href="/">Home</a></li>
+                        <li></li>
+                    </ul>
+                </nav>
+
+            </div>
+        </div>
+    </div>
+</div> -->
+
+<div class="container" style="min-height: 80vh;">
+    <div class="row mt-5 pt-5">
+        <div class="col-xl-6 offset-xl-3">
+            <div class="login-register-page">
+                <div class="welcome-text">                    
+                    <h3 style="font-size: 26px;">Are you sure you want to delete your account?</h3>
+                </div>
+
+
+                <form class="mt-4 justify-content-md-center" action="/delete-account" method="post">
+                    <button type="submit" class="btn btn-outline-danger"><i class="icon-line-awesome-exclamation-triangle"></i>Delete</button>
+                    <a href="/" class="btn btn-outline-success">Go Back</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include ('partials/footer') %>

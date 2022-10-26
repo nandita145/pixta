@@ -1,0 +1,88 @@
+<%- include ('partials/header') %>
+
+<div id="titlebar" class="gradient">
+    <div class="container">
+        <div class="row">
+            <!-- <div class="col-md-12 mt-5">
+                <h2>Login</h2>
+
+            </div> -->
+        </div>
+    </div>
+</div>
+
+<div class="container" style="min-height: 75vh;">
+    <div class="row mt-5 ">
+        <div class="col-xl-6 offset-xl-3 card shadow">
+            <div class="login-register-page p-3">
+                <div class="col-md-12 mt-5">
+                    <h2>Login</h2>
+    
+                </div>
+                <div class="welcome-text">
+                    <h4 >We are glad to see you again!</h4>
+                </div>
+
+                <% if (typeof query.message !== "undefined"){ %>
+                    
+                        <% if (query.message == "registered") { %>
+                            <div class="alert alert-success">
+                            Account has been created. Please login now.
+                            </div>
+                        <% } %>
+
+                        <% if (query.message == "password_reset"){ %>
+                            <div class="alert alert-success">
+                                Password has been changed. Please login now.
+                            </div>
+                        <% } %>
+
+                    
+                    
+                        <% if (query.message == "account_deleted") { %>
+                            <div class="alert alert-warning">
+                            Your Account has been deleted. Sorry to see you go ;_;
+                            </div>
+                        <% } %>
+                <% } %>
+
+                <% if (typeof query.error !== "undefined"){ %>
+                    <div class="alert alert-danger">
+                        <% if (query.error == "not_exists"){ %>
+                            Email does not exist.
+                        <% } %>
+
+                        <% if (query.error == "wrong_password"){ %>
+                            Password is incorrect.
+                        <% } %>
+
+                        <% if (query.error == "user_deleted") { %>
+                            User has been deleted.
+                        <% } %>
+
+                    </div>
+                <% } %>
+
+                <form action="/login" method="post">
+
+                    <div class="input-with-icon-left mb-3">
+                        <i class="icon-material-baseline-mail-outline"></i>
+                        <input type="text" name="email" id="" class="form-control input-text with-border" placeholder="Email Address" required />
+                    </div>
+
+                    <div class="input-with-icon-left mb-3" data-tippy-placement="bottom">
+                        <i class="icon-material-outline-lock"></i>
+                        <input type="password" name="password" id="" class="form-control input-text with-border" placeholder="Enter Password" required />
+                    </div>
+<div class="d-grid">
+                    <button type="submit" class="button-sm mb-3 text-center full-width button-sliding-icon ripple-effect margin-top-10" type="submit">Login <i class="icon-material-outline-arrow-right-alt"></i></button>
+                </div>
+                    <p class="text-center">Don't have an account? <a class="text-decoration-none" href="/register">Sign Up!</a></p>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<%- include ('partials/footer') %>

@@ -1,0 +1,160 @@
+<%- include ('partials/header') %>
+<div class="container p-4">
+<div class="" style="min-height: 70vh;">
+<div class="section white padding-top-0 margin-top-60 padding-bottom-60 full-width-carousel-fix">
+    <div class="container">
+
+        <% if (typeof query.message !== "undefined"){ %>
+            <div class="alert alert-success">
+                <% if (query.message == "image_uploaded"){ %>
+                    Image has been successfully uploaded
+
+                <% } %>
+            </div>
+        <% } %>
+
+        <% if (typeof isLogin !== "undefined" && isLogin) { %>
+            <form class="text-center" action="/upload-image" id="form-upload-image" enctype="multipart/form-data" style="margin-bottom: 20px;" method="post">
+                <h3  style="margin-bottom: 40px;">Upload file</h3>
+
+                <input type="file" name="image" id="input-file-image" accept="image/*" required style="display: none;" onchange="showImageInModal(this);">
+                <a href="javascript:void(0);" onclick="$('#input-file-image').click()" class="button ripple-effect offset-md-5" style="width:200px; text-align:center;">Upload Image</a>
+            </form>
+        <% } %>
+
+        <script>
+            function doLike(self) {
+                var _id = self.getAttribute("data-id");
+                var isLiked = self.getAttribute("data-is-Liked")=="true";
+                if(!isLiked){
+                    self.setAttribute("disabled", "disabled");
+                    self.style.backgroundColor="darkgray";
+                    self.style.color="white";
+                } 
+                
+                $.ajax({
+                    url:"/do-like",
+                    method:"POST",
+                    data:{
+                        "_id":_id
+                    },
+                    success: function (response) {
+                        console.log(response);
+                        if(response.status=="success"){
+                            self.style.backgroundColor="royalblue";
+                            self.style.color="white";
+                            var likes = parseInt(self.getAttribute("data-likes"));
+                            likes++;
+                            self.innerHTML="Like ("+likes +")";
+                            self.setAttribute("data-is-liked","true");
+
+                        }else{
+                            alert(response.message);
+                            if(!isLiked){
+                                self.style.backgroundColor="#fff";
+                                self.style.color="black";
+                            }
+                        }
+                    }
+                });
+                return false;
+            }
+        </script>
+
+            <div class="row mt-5">
+                <div class="col-xl-12">
+                    <div class="blog-carousel1 row justify-content-md-center">
+                        <h3 class="container text-center">
+                            Follow People to see more posts
+                        </h3>
+                        <% if (typeof isLogin !== "undefined" && isLogin) { %>
+                        <% images.forEach(function(image){ %>
+                            
+                            <div class="col-md-9 mb-4 ">
+                                <a href="/view-image?id=<%= image._id %>" class="blog-compact-item-container border rounded">
+                                    <div class="blog-compact-item">
+                                        <img src="<%= image.filePath %>" alt="" srcset="User profile image">
+
+                                        <% if(typeof isLogin !== "undefined" && isLogin){
+                                            var hasLiked = false;
+                                            image.likers.forEach(function(liker){
+                                                if(liker._id == user._id){
+                                                    hasLiked=true;
+                                                }
+                                            })
+                                            if(hasLiked){ %>
+                                                <span data-is-liked="true" onclick="doLike(this);" data-id="<%= image._id %>" class="blog-item-tag liked">Like (<%= image.likers.length %>)</span>
+                                            <% } else { %>
+                                                <span data-is-liked="false" onclick="doLike(this);" data-id="<%= image._id %>" class="blog-item-tag">Like (<%= image.likers.length %>)</span>
+                                            <% }
+                                        } else{ %>
+                                                <span data-is-liked="false" onclick="doLike(this);" data-id="<%= image._id %>" class="blog-item-tag">Like (<%= image.likers.length %>)</span>
+                                        <% } %>
+
+                                        <div class="blog-compact-item-content">
+                                            <ul class="blog-post-tags">
+                                                <li>
+                                                    <% var createdAt = new Date(image.createdAt);
+                                                    var date = createdAt.getDate()+"";
+                                                    %>
+                                                    <%= date.padStart(2,"0")+" "+ months[createdAt.getMonth()]+", "+ createdAt.getFullYear() %>
+                                                </li>
+                                            </ul>
+                                            <h3><%= image.user.name %></h3>
+                                        </div>
+                                    </div>
+                                    <p class="mx-3 text-black"><%= image.caption %></p>
+                                </a>
+                            </div>
+                        <% }) %>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            
+      
+
+
+    </div>
+</div>
+
+<div class="modal" id="modal-image-upload">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Upload Image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+            </div>
+            <div class="modal-body">
+                <img id="preview" class="img-fluid">
+                <textarea form="form-upload-image" placeholder="Caption" name="caption" class="form-control" id="" cols="10" rows="3"></textarea>
+            </div>
+            <div class="modal-footer">
+                
+                <button type="submit" form="form-upload-image" class="button-sm ripple-effect">Upload Image</button>
+                <button type="button" class="btn btn-secondary gray ripple-effect-dark" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+</div>
+<script>
+    function showImageInModal(file) {
+        var file = document.getElementById('input-file-image').files;
+        if(file.length>0){
+            var fileReader = new FileReader();
+            fileReader.onload=function (event) {
+                document.getElementById('preview').setAttribute('src', event.target.result);
+                $('#modal-image-upload').modal('show');
+
+            };
+            fileReader.readAsDataURL(file[0]);
+        }
+        
+    }
+</script>
+
+<%- include ('partials/footer') %>
