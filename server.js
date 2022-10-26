@@ -22,7 +22,7 @@ app.use(expressSession({
     'saveUninitialized': true,
     store: new MemoryStore({
         checkPeriod: 86400000 // prune expired entries every 24h
-      })
+    })
 }));
 
 var bodyParser = require('body-parser');
@@ -59,6 +59,12 @@ function getUser(userId, callBack) {
         }
     });
 }
+const cloudinary = require('cloudinary');
+cloudinary.config({
+    cloud_name: process.env.CLOUD_NAME,
+    api_key: process.env.API_KEY,
+    api_secret: process.env.API_SECRET
+});
 
 http.listen(process.env.PORT || 3000, function () {
     console.log("Connected");
@@ -131,7 +137,7 @@ http.listen(process.env.PORT || 3000, function () {
                     if (user == null) {
                         bcrypt.hash(request.body.password, 10, function (error3, hash) {
                             database.collection('users').insertOne({
-                                
+
                                 'name': request.body.name,
                                 'email': request.body.email,
                                 'password': hash,
@@ -206,39 +212,129 @@ http.listen(process.env.PORT || 3000, function () {
 
             // var fs=require('fs-extra');
 
+            // app.post('/upload-image', async function (request, response) {
+            //     if (request.session.user_id) {
+            //         var formData = new formidable.IncomingForm();
+            //         formData.maxFileSize = 1000 * 1024 * 1024;
+            //         formData.parse(request, function (error1, fields, files) {
+
+            //             var oldPath = files.image.path;
+            //             var caption = fields.caption;
+
+            //             var newPath = 'public/uploads/' + new Date().getTime() + '-' + files.image.name;
+
+            //             fileSystem.rename(oldPath, newPath, function (error2) {
+            //                 getUser(request.session.user_id, function (user) {
+
+            //                     // console.log(user+'uploimg')
+            //                     delete user.password;
+            //                     var currentTime = new Date().getTime();
+
+            //                     database.collection('images').insertOne({
+            //                         'filePath': newPath,
+            //                         'user': user,
+            //                         'caption': caption,
+            //                         'createdAt': currentTime,
+            //                         'likers': [],
+            //                         'comments': []
+
+            //                     }, function (error2, data) {
+            //                         response.redirect('/?message=image_uploaded');
+            //                     })
+            //                 })
+            //             })
+            //         })
+            //     }
+            // })
+
+
+
             app.post('/upload-image', async function (request, response) {
                 if (request.session.user_id) {
                     var formData = new formidable.IncomingForm();
                     formData.maxFileSize = 1000 * 1024 * 1024;
                     formData.parse(request, function (error1, fields, files) {
-
-                        var oldPath = files.image.path;
-                        var caption = fields.caption;
-
-                        var newPath = 'public/uploads/' + new Date().getTime() + '-' + files.image.name;
-
-                        fileSystem.rename(oldPath, newPath, function (error2) {
-                            getUser(request.session.user_id, function (user) {
-
-                                // console.log(user+'uploimg')
-                                delete user.password;
+                        getUser(request.session.user_id, function (user) {
+                            // var oldPath = files.image.path;
+                            var caption = fields.caption;
+                            var oldpath = files.image.path;
+                            var img = fileSystem.readFileSync(oldpath);
+                            var publicid;
+                            var iurl;
+                            cloudinary.uploader.upload(oldpath, function (result) {
+                                // console.log(result)
+                                for (var attributename in result) {
+                                    if (attributename == 'public_id') {
+                                        publicid = result[attributename]
+                                    }
+                                    if (attributename == 'url') {
+                                        iurl = result[attributename]
+                                    }
+                                }
                                 var currentTime = new Date().getTime();
-
-                                database.collection('images').insertOne({
-                                    'filePath': newPath,
+                                delete user.password;
+                                // mongoClient.connect(process.env.DATABASE, function(err, db) {
+                                //   if (err) throw err;
+                                //   var dbo = db.db("mydb");
+                                var myobj = {
+                                    // name:publicid ,
+                                    //  imageURl: iurl ,
+                                    'filePath': iurl,
                                     'user': user,
                                     'caption': caption,
                                     'createdAt': currentTime,
                                     'likers': [],
                                     'comments': []
+                                }
+                                database.collection("images").insertOne(myobj, function (err, res) {
+                                    if (err){
+                                        throw err
+                                    }
+                                    else{
+                                        response.redirect('/?message=image_uploaded');
+                                        
+                                    }
+                                    // console.log("1 document inserted");
+                                    // db.close();
+                                });
 
-                                }, function (error2, data) {
-                                    response.redirect('/?message=image_uploaded');
-                                })
-                            })
+                                // var mysort = { name: 1 };
+                                // database.collection("images").find().sort(mysort).toArray(function (err, result) {
+                                //     if (err) throw err;
+                                //     console.log(result);
+                                //     // db.close();
+                                // });
+
+                                // , function (error2, data) {
+                                //     response.redirect('/?message=image_uploaded');
+                                // }
+                            });
+                        });
+
+                        // var newPath = 'public/uploads/' + new Date().getTime() + '-' + files.image.name;
+
+                        // fileSystem.rename(oldPath, newPath, function (error2) {
+                        //     getUser(request.session.user_id, function (user) {
+
+                        //         // console.log(user+'uploimg')
+                        //         delete user.password;
+                        //         var currentTime = new Date().getTime();
+
+                        //         database.collection('images').insertOne({
+                        //             'filePath': newPath,
+                        //             'user': user,
+                        //             'caption': caption,
+                        //             'createdAt': currentTime,
+                        //             'likers': [],
+                        //             'comments': []
+
+                        //         }, function (error2, data) {
+                        //             response.redirect('/?message=image_uploaded');
+                        //         })
+                        //     })
+                        // })
                         })
-                    })
-                }
+                    }
             })
 
 
@@ -392,19 +488,19 @@ http.listen(process.env.PORT || 3000, function () {
                             '_id': ObjectId(request.query.id)
                         })
                         // console.log(userDetails)
-                        console.log(userDetails.followers, userDetails.following)
+                        // console.log(userDetails.followers, userDetails.following)
 
-                        var followers_list= await database.collection('users').find({
-                            '_id':{"$in":userDetails.followers}
+                        var followers_list = await database.collection('users').find({
+                            '_id': { "$in": userDetails.followers }
                         })
                         // console.log(followers_list)
 
-                        
-                        var followings_list= await database.collection('users').find({
-                            '_id':{"$in":userDetails.following}
+
+                        var followings_list = await database.collection('users').find({
+                            '_id': { "$in": userDetails.following }
                         })
                         // console.log(followings_list)
-                        
+
                         // console.log("images", Images)
                         // console.log("ok " + requestedUser[0].followers+ JSON.stringify(requestedUser))
                         var ownProfile = user._id.toString() == requestedUser[0]._id.toString() ? true : false
@@ -417,8 +513,8 @@ http.listen(process.env.PORT || 3000, function () {
                             'requestedUser': requestedUser[0],
                             'following': following,
                             'ownProfile': ownProfile,
-                            'followers_list':userDetails.followers,
-                            'followings_list':userDetails.following
+                            'followers_list': userDetails.followers,
+                            'followings_list': userDetails.following
 
                         });
                     });
@@ -494,7 +590,7 @@ http.listen(process.env.PORT || 3000, function () {
                 if (request.session.user_id) {
                     getUser(request.session.user_id, async function (user) {
                         var idToLike = request.body.like;
-                        console.log("L",idToLike);
+                        // console.log("L", idToLike);
                         var RequestedImageArray = await database.collection('images').findOneAndUpdate({
                             '_id': ObjectId(idToLike)
                         }, {
@@ -558,32 +654,113 @@ http.listen(process.env.PORT || 3000, function () {
             });
 
 
+            // app.post('/change-profile', function (request, response) {
+            //     if (request.session.user_id) {
+            //         var formData = new formidable.IncomingForm();
+            //         formData.maxFileSize = 1000 * 1024 * 1024;
+            //         formData.parse(request, function (error1, fields, files) {
+            //             var oldPath = files.image.path;
+            //             var caption = fields.caption;
+
+            //             var newPath = 'public/profile/' + new Date().getTime() + '-' + files.image.name;
+
+            //             fileSystem.rename(oldPath, newPath, function (error2) {
+            //                 getUser(request.session.user_id, function (user) {
+
+            //                     // console.log(user+'uploimg')
+            //                     delete user.password;
+            //                     var currentTime = new Date().getTime();
+
+            //                     database.collection('users').updateOne({
+            //                         '_id': ObjectId(request.session.user_id)
+            //                     }, {
+            //                         $set: { 'profile': newPath }
+            //                     }, function (error2, data) {
+            //                         response.redirect('/view-profile?id=' + request.session.user_id);
+            //                     })
+            //                 })
+            //             })
+            //         })
+            //     }
+            // })
+
+
             app.post('/change-profile', function (request, response) {
                 if (request.session.user_id) {
                     var formData = new formidable.IncomingForm();
                     formData.maxFileSize = 1000 * 1024 * 1024;
                     formData.parse(request, function (error1, fields, files) {
-                        var oldPath = files.image.path;
-                        var caption = fields.caption;
-
-                        var newPath = 'public/profile/' + new Date().getTime() + '-' + files.image.name;
-
-                        fileSystem.rename(oldPath, newPath, function (error2) {
-                            getUser(request.session.user_id, function (user) {
-
-                                // console.log(user+'uploimg')
-                                delete user.password;
+                        // var oldPath = files.image.path;
+                        // var caption = fields.caption;
+                        getUser(request.session.user_id, function (user) {
+                            // var oldPath = files.image.path;
+                            var caption = fields.caption;
+                            var oldpath = files.image.path;
+                            var img = fileSystem.readFileSync(oldpath);
+                            var publicid;
+                            var iurl;
+                            cloudinary.uploader.upload(oldpath, function (result) {
+                                // console.log(result)
+                                for (var attributename in result) {
+                                    if (attributename == 'public_id') {
+                                        publicid = result[attributename]
+                                    }
+                                    if (attributename == 'url') {
+                                        iurl = result[attributename]
+                                    }
+                                }
                                 var currentTime = new Date().getTime();
-
+                                delete user.password;
+                                // mongoClient.connect(process.env.DATABASE, function(err, db) {
+                                //   if (err) throw err;
+                                //   var dbo = db.db("mydb");
+                                // var myobj = {
+                                //     // name:publicid ,
+                                //     //  imageURl: iurl ,
+                                //     'filePath': iurl,
+                                //     'user': user,
+                                //     'caption': caption,
+                                //     'createdAt': currentTime,
+                                //     'likers': [],
+                                //     'comments': []
+                                // }
                                 database.collection('users').updateOne({
-                                    '_id': ObjectId(request.session.user_id)
-                                }, {
-                                    $set: { 'profile': newPath }
-                                }, function (error2, data) {
-                                    response.redirect('/view-profile?id=' + request.session.user_id);
-                                })
-                            })
-                        })
+                                                '_id': ObjectId(request.session.user_id)
+                                            }, {
+                                                $set: { 'profile': iurl }
+                                            }, function (error2, data) {
+                                                response.redirect('/view-profile?id=' + request.session.user_id);
+                                            })
+                                // var mysort = { name: 1 };
+                                // database.collection("images").find().sort(mysort).toArray(function (err, result) {
+                                //     if (err) throw err;
+                                //     console.log(result);
+                                //     // db.close();
+                                // });
+
+                                // , function (error2, data) {
+                                //     response.redirect('/?message=image_uploaded');
+                                // }
+                            });
+                        });
+                        // var newPath = 'public/profile/' + new Date().getTime() + '-' + files.image.name;
+
+                        // fileSystem.rename(oldPath, newPath, function (error2) {
+                        //     getUser(request.session.user_id, function (user) {
+
+                        //         // console.log(user+'uploimg')
+                        //         delete user.password;
+                        //         var currentTime = new Date().getTime();
+
+                        //         database.collection('users').updateOne({
+                        //             '_id': ObjectId(request.session.user_id)
+                        //         }, {
+                        //             $set: { 'profile': newPath }
+                        //         }, function (error2, data) {
+                        //             response.redirect('/view-profile?id=' + request.session.user_id);
+                        //         })
+                        //     })
+                        // })
                     })
                 }
             })
@@ -595,7 +772,7 @@ http.listen(process.env.PORT || 3000, function () {
                             '_id': ObjectId(request.session.user_id)
                         })
 
-                        console.log(userDetails)
+                        // console.log(userDetails)
                         response.render('settings', {
                             'isLogin': true,
                             'query': request.query,
@@ -630,25 +807,25 @@ http.listen(process.env.PORT || 3000, function () {
                             response.redirect('/settings?error=mismatch');
                             return;
                         }
-                        var current_password=request.body.current_password;
+                        var current_password = request.body.current_password;
                         database.collection('users').findOne({
                             '_id': ObjectId(request.session.user_id)
                         }, function (error1, user) {
-                                bcrypt.compare(current_password, user.password, function (error2, isPasswordVerify) {
-                                    if (isPasswordVerify) {
-                                        bcrypt.hash(request.body.password, 10, function (error3, hash) {
-                                            database.collection('users').updateOne({
-                                                '_id': ObjectId(request.session.user_id)
-                                            }, {
-                                                $set: { 'password': hash }
-                                            });
+                            bcrypt.compare(current_password, user.password, function (error2, isPasswordVerify) {
+                                if (isPasswordVerify) {
+                                    bcrypt.hash(request.body.password, 10, function (error3, hash) {
+                                        database.collection('users').updateOne({
+                                            '_id': ObjectId(request.session.user_id)
+                                        }, {
+                                            $set: { 'password': hash }
                                         });
-                                        response.redirect('settings?message=password_updated')
-                                    } else {
-                                        response.redirect('settings?error=wrong_password')
-                                    }
-                                });
-                        
+                                    });
+                                    response.redirect('settings?message=password_updated')
+                                } else {
+                                    response.redirect('settings?error=wrong_password')
+                                }
+                            });
+
                         })
 
                     })
