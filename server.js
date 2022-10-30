@@ -476,7 +476,7 @@ http.listen(process.env.PORT || 3000, function () {
 
                         var followStatus = await database.collection('users').findOne({
                             '_id': ObjectId(requested_user),
-                            'followers._id': request.session.user_id
+                            'followers._id': ObjectId(request.session.user_id)
                         })
                         var following = 'Follow';
                         if (followStatus) {
@@ -520,29 +520,131 @@ http.listen(process.env.PORT || 3000, function () {
                     });
                 }
             });
+            // app.get('/view-profile', function (request, response) {
+            //     if (request.session.user_id) {
+            //         getUser(request.session.user_id, async function (user) {
+
+            //             requested_user = request.query.id;
+            //             // requested_user=request.body.id;
+            //             // console.log("ru",requested_user)
+            //             var requestedUser = await database.collection('users').find({
+            //                 '_id': ObjectId(requested_user)
+            //             }).toArray()
+            //             var Images = await database.collection('images').find({
+            //                 'user._id': ObjectId(requested_user)
+            //             }).sort({
+            //                 'createdAt': -1
+            //             }).toArray()
+
+            //             var followStatus = await database.collection('users').findOne({
+            //                 '_id': ObjectId(requested_user),
+            //                 'followers._id': request.session.user_id
+            //             })
+            //             var following = 'Follow';
+            //             if (followStatus) {
+            //                 following = 'Following'
+            //             } else {
+            //                 following = 'Follow'
+            //             }
+            //             var userDetails = await database.collection('users').findOne({
+            //                 '_id': ObjectId(request.query.id)
+            //             })
+            //             // console.log(userDetails)
+            //             // console.log(userDetails.followers, userDetails.following)
+
+            //             var followers_list = await database.collection('users').find({
+            //                 '_id': { "$in": userDetails.followers }
+            //             })
+            //             // console.log(followers_list)
+
+
+            //             var followings_list = await database.collection('users').find({
+            //                 '_id': { "$in": userDetails.following }
+            //             })
+            //             // console.log(followings_list)
+
+            //             // console.log("images", Images)
+            //             // console.log("ok " + requestedUser[0].followers+ JSON.stringify(requestedUser))
+            //             var ownProfile = user._id.toString() == requestedUser[0]._id.toString() ? true : false
+            //             // console.log(ownProfile)
+            //             response.render('view-profile', {
+            //                 'isLogin': true,
+            //                 'query': request.query,
+            //                 'images': Images,
+            //                 'user': user,
+            //                 'requestedUser': requestedUser[0],
+            //                 'following': following,
+            //                 'ownProfile': ownProfile,
+            //                 'followers_list': userDetails.followers,
+            //                 'followings_list': userDetails.following
+
+            //             });
+            //         });
+            //     }
+            // });
+
+            
+            // app.post('/follow', function (request, response) {
+            //     if (request.session.user_id) {
+            //         getUser(request.session.user_id, async function (user) {
+            //             var idToFollow = request.body.follow;
+            //             // console.log(idToFollow);
+            //             var RequestedUserArray = await database.collection('users').findOneAndUpdate({
+            //                 '_id': ObjectId(idToFollow)
+            //             }, {
+            //                 $addToSet: {
+            //                     "followers": {
+            //                         "_id": request.session.user_id
+            //                     }
+            //                 }
+            //             })
+
+            //             var loggedInUserArray = await database.collection('users').findOneAndUpdate({
+            //                 '_id': ObjectId(request.session.user_id)
+            //             }, {
+            //                 $addToSet: {
+            //                     "following": {
+            //                         "_id": idToFollow
+            //                     }
+
+            //                 }
+            //             })
+            //             response.redirect('view-profile?id=' + idToFollow)
+
+            //         })
+            //     }
+            // });
 
             app.post('/follow', function (request, response) {
                 if (request.session.user_id) {
                     getUser(request.session.user_id, async function (user) {
                         var idToFollow = request.body.follow;
                         // console.log(idToFollow);
+                        var userToFollow= await database.collection('users').findOne({
+                            '_id':ObjectId(idToFollow)
+                        })
+                        // console.log(userToFollow)
+                        delete user.password;
+                        delete user.followers;
+                        delete user.following;
                         var RequestedUserArray = await database.collection('users').findOneAndUpdate({
                             '_id': ObjectId(idToFollow)
                         }, {
                             $addToSet: {
-                                "followers": {
-                                    "_id": request.session.user_id
-                                }
+                                "followers": user
+                                
                             }
                         })
 
+                        delete userToFollow.password;
+                        delete userToFollow.followers;
+                        delete userToFollow.following;
                         var loggedInUserArray = await database.collection('users').findOneAndUpdate({
                             '_id': ObjectId(request.session.user_id)
                         }, {
                             $addToSet: {
-                                "following": {
-                                    "_id": idToFollow
-                                }
+                                "following":  userToFollow
+
 
                             }
                         })
@@ -554,15 +656,24 @@ http.listen(process.env.PORT || 3000, function () {
             app.post('/unfollow', function (request, response) {
                 if (request.session.user_id) {
                     getUser(request.session.user_id, async function (user) {
-                        var idToFollow = request.body.follow;
+                        var idToUnfollow = request.body.follow;
+                        var userToUnfollow= await database.collection('users').findOne({
+                            '_id':ObjectId(idToUnfollow)
+                        })
+                        // console.log(idToUnfollow)
+                        delete user.password;
+                        delete user.followers;
+                        delete user.following;
+                        delete userToUnfollow.password;
+                        delete userToUnfollow.followers;
+                        delete userToUnfollow.following;
                         // console.log(idToFollow);
+                        // console.log("user to unfollow",userToUnfollow)
                         var RequestedUserArray = await database.collection('users').findOneAndUpdate({
-                            '_id': ObjectId(idToFollow)
+                            '_id': ObjectId(idToUnfollow)
                         }, {
                             $pull: {
-                                "followers": {
-                                    "_id": request.session.user_id
-                                }
+                                "followers": user
                             }
                         })
 
@@ -570,13 +681,13 @@ http.listen(process.env.PORT || 3000, function () {
                             '_id': ObjectId(request.session.user_id)
                         }, {
                             $pull: {
-                                "following": {
-                                    "_id": idToFollow
-                                }
+                                "following":userToUnfollow
 
                             }
                         })
-                        response.redirect('view-profile?id=' + idToFollow)
+
+                        // console.log(loggedInUserArray)
+                        response.redirect('view-profile?id=' + idToUnfollow)
 
                     })
                 }

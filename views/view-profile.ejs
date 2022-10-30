@@ -83,22 +83,28 @@
                  <div class="container">
                     <div class="row justify-content-md-center m-4">
                         
-                        <div class="col-md-3"><span class="fw-bolder">
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-outline-primary mb-5" data-bs-toggle="modal" data-bs-target="#followersModal">
+
+                            <span class="fw-bolder">
                             <% if(requestedUser.followers){ %>
                             <%= requestedUser.followers.length %> 
                             <% } else { %>
                                 0
                             <% } %>
-                        </span>Followers</div>
+                        </span>Followers </button></div>
                        
-                        <div class="col-md-3"><span class="fw-bold">
+                        <div class="col-md-3">
+                            <button type="button" class="btn btn-outline-primary mb-5" data-bs-toggle="modal" data-bs-target="#followingModal">
+
+                            <span class="fw-bold">
                             <% if(requestedUser.following){ %>
                             <%= requestedUser.following.length %>
                             <% } else { %>
                                 0
                             <% } %>
                         </span> 
-                            Followings</div>
+                            Followings</button></div>
                     </div>
                  </div>
                  <% if (ownProfile==false){ %>
@@ -254,24 +260,58 @@
 </div>
 
       <!-- Modal -->
-      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal fade" id="followersModal" tabindex="-1" aria-labelledby="followersModalLabel" aria-hidden="true">
         <div class="modal-dialog">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Followers</h5>
+              <h5 class="modal-title" id="followersModalLabel">Followers</h5>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <% for(var i=0;i< followers_list.length;i++){ %>
-                <%= followers_list[i]._id %>
+                    <li class="list-group-item">
+                        <a class="text-decoration-none" href="/view-profile?id=<%= followers_list[i]._id %>">
+                            <div class="row">
+                        <div class="col-md-8"> <%= followers_list[i].name %></div>
+                        <button class="col-md-3 btn btn-primary">View Profile</button>
+                    </div>
+                    </a>
+                </li>
                 <% } %>
-                <% for(var i=0;i< followings_list.length;i++){ %>
-                    <%= followings_list[i]._id %>
-                    <% } %>
+
             </div>
           </div>
         </div>
       </div>
+
+
+
+      <!-- Modal -->
+      <div class="modal fade" id="followingModal" tabindex="-1" aria-labelledby="followingModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="followingModalLabel">Following</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <ul class="list-group">
+                <% for(var i=0;i< followings_list.length;i++){ %>
+                    <li class="list-group-item">
+                        <a class="text-decoration-none" href="/view-profile?id=<%= followings_list[i]._id %>">
+                            <div class="row">
+                        <div class="col-md-8"> <%= followings_list[i].name %></div>
+                        <button class="col-md-3 btn btn-primary">View Profile</button>
+                    </div>
+                    </a>
+                </li>
+                    <% } %>
+                </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
 
 
 </div>
