@@ -1,3 +1,4 @@
+// "start": "serve -s build",
 {
   "name": "image-sharing",
   "version": "1.0.0",
@@ -8,7 +9,7 @@
   },
   "scripts": {
     "start": "node server.js"
-    // "start": "serve -s build",
+    
     "heroku-postbuild": "npm run build"
   },
   "author": "nandita",
